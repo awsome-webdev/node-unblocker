@@ -1,14 +1,29 @@
 {
-    "builds": [
+  "builds": [
+    {
+      "src": "app.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "app.js"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
         {
-            "src": "app.js",
-            "use": "@vercel/node"
-        }
-    ],
-    "routes": [
+          "key": "X-Frame-Options",
+          "value": "ALLOWALL"
+        },
         {
-          "src": "/(.*)",
-          "dest": "app.js"
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors *"
         }
       ]
+    }
+  ]
 }
