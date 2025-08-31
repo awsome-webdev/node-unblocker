@@ -2,7 +2,6 @@
  * node-unblocker: Web Proxy for evading firewalls and content filters,
  * similar to CGIProxy or PHProxy
  *
- *
  * This project is hosted on github:  https://github.com/nfriedly/nodeunblocker.com
  *
  * By Nathan Friedly - http://nfriedly.com
@@ -41,8 +40,6 @@ function addGa(html) {
 
 function googleAnalyticsMiddleware(data) {
     if (data.contentType == 'text/html') {
-
-        // https://nodejs.org/api/stream.html#stream_transform
         data.stream = data.stream.pipe(new Transform({
             decodeStrings: false,
             transform: function(chunk, encoding, next) {
@@ -53,29 +50,38 @@ function googleAnalyticsMiddleware(data) {
     }
 }
 
+// 🔽 NEW middleware to strip/overwrite headers
+function stripBlockingHeaders(data) {
+    // normalize header names to lowercase
+    for (let key of Object.keys(data.headers)) {
+        const lower = key.toLowerCase();
+        if (lower === "x-frame-options" || lower === "content-security-policy") {
+            delete data.headers[key];
+        }
+    }
+    // Optionally, re-add a permissive header
+    data.headers["x-frame-options"] = "ALLOWALL";
+}
+
 var unblockerConfig = {
     prefix: '/proxy/',
     requestMiddleware: [
         youtube.processRequest
     ],
     responseMiddleware: [
-        googleAnalyticsMiddleware
+        googleAnalyticsMiddleware,
+        stripBlockingHeaders   // <-- added here
     ]
 };
 
 var unblocker = new Unblocker(unblockerConfig);
 
-// this line must appear before any express.static calls (or anything else that sends responses)
 app.use(unblocker);
 
-// serve up static files *after* the proxy is run
 app.use('/', express.static(__dirname + '/public'));
 
-// this is for users who's form actually submitted due to JS being disabled or whatever
 app.get("/no-js", function(req, res) {
-    // grab the "url" parameter from the querystring
     var site = querystring.parse(url.parse(req.url).query).url;
-    // and redirect the user to /proxy/url
     res.redirect(unblockerConfig.prefix + site);
 });
 
@@ -83,4 +89,4 @@ const port = process.env.PORT || process.env.VCAP_APP_PORT || 8080;
 
 app.listen(port, function() {
     console.log(`node unblocker process listening at http://localhost:${port}/`);
-}).on("upgrade", unblocker.onUpgrade); // onUpgrade handles websockets
+}).on("upgrade", unblocker.onUpgrade);
