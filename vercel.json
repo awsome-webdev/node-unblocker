@@ -21,7 +21,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "frame-ancestors 'self' https:"
+          "value": "frame-ancestors * https://*"
         }
       ]
     }
