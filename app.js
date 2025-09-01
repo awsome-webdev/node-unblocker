@@ -1,12 +1,4 @@
-/***************
- * node-unblocker: Web Proxy for evading firewalls and content filters,
- * similar to CGIProxy or PHProxy
- *
- * This project is hosted on github:  https://github.com/nfriedly/nodeunblocker.com
- *
- * By Nathan Friedly - http://nfriedly.com
- * Released under the terms of the Affero GPL v3
- */
+
 
 var url = require('url');
 var querystring = require('querystring');
@@ -17,7 +9,7 @@ var youtube = require('unblocker/examples/youtube/youtube.js')
 
 var app = express();
 
-var google_analytics_id = process.env.GA_ID || null;
+var google_analytics_id = null;
 
 function addGa(html) {
     if (google_analytics_id) {
@@ -50,7 +42,6 @@ function googleAnalyticsMiddleware(data) {
     }
 }
 
-// 🔽 NEW middleware to strip/overwrite headers
 function stripBlockingHeaders(data) {
     // normalize header names to lowercase
     for (let key of Object.keys(data.headers)) {
