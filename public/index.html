@@ -111,7 +111,7 @@
       <form action="no-js" method="get" id="unblocker-form">
         <p>
           
-          Search with duckduck go<br>
+          Search with bing<br>
           <input type="text" id="url" name="url" autofocus="autofocus" />
         </p>
 
@@ -134,8 +134,8 @@
         if (url.includes('.') && !url.includes(' ')) {
           url = "https://" + url;
         } else
-        
-        url = "https://duckduckgo.com/?t=h_&q=" + encodeURIComponent(url);
+
+        url = "https://bing.com/search?q=" + encodeURIComponent(url);
       }
       window.location = location.protocol + '//' + location.host + '/proxy/' + url;
       return false;
